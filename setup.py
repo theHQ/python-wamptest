@@ -1,8 +1,8 @@
 from distutils.core import setup
 setup(
-    name='wamputils',
-    packages=['wamputils'],
-    version='0.1',
+    name='wamptest',
+    packages=['wamptest'],
+    version='0.2',
     description='This is a library designed to test WAMP Crossbar connections',
     author='Eric Chapman',
     author_email='eric@headquartershq.com',
