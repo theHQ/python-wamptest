@@ -6,10 +6,10 @@ also not suiting my needs since it needs to run a reactor.  I wanted something t
 for connecting to an actual router.
 
 The library creates a class called "wamptest.TestCase" that subclasses from "autobahn.twisted.wamp.ApplicationSession" 
-which will allow it to connect to a router.  When you call "main" it will iterate through an array of test suites
+which will allow it to connect to a router.  When you call "main" it will iterate through an array of test cases
 that will do the following
 
-  - For each class in test-suites
+  - For each test case in the test cases
     - Connect to the router using an ApplicationRunner
     - Iterate through the tests (any method that start with "test_")
     - Gather pass/fail information
@@ -27,9 +27,9 @@ The test is run by calling "main".  Here is an example
 It supports the following "unittest" like life cycle callbacks
 
   - setUpClass(cls): Called once at the start of the Test Case
-  - setUpTest(self): Called once before each test
-  - teardownTest(self): Called once after each test
-  - teardownClass(cls): Called once at the end of the Test Case
+  - setUp(self): Called once before each test
+  - tearDown(self): Called once after each test
+  - tearDownClass(cls): Called once at the end of the Test Case
     
 It supports the following "unittest" like asserts
 
@@ -118,7 +118,7 @@ if the tests were successful and non zero otherwise.  To get the pass/fail resul
     
     exit $(docker-compose ps -q | xargs docker inspect -f '{{ .Name }} exited with status {{ .State.ExitCode }}' | grep test_1 | cut -f5 -d ' ')
 
-This is a little hacky and hopefully docker will fix it.  This should do the trick for now.
+This is a little hacky (and hopefully Docker will fix it) but it will do the trick for now.
 
 The Docker Compose file creates a generic router with an example service connected to it and then creates a test suite 
 using "wamptest" to test the service.
