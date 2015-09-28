@@ -1,0 +1,14 @@
+router:
+  image: erichq/crossbar
+  ports:
+    - "8080:8080"
+
+service:
+  build: tests/.
+  links:
+    - router
+
+test:
+  build: .
+  links:
+    - router
