@@ -1,10 +1,10 @@
 import unittest
-import wamptest.wamptest
+import wamptest
 
 
 class MainLifecycleTests(unittest.TestCase):
 
-    class ExampleTestCase(wamptest.wamptest.TestCase):
+    class ExampleTestCase(wamptest.TestCase):
 
         _setup_class_count = 0
         _setup_count = 0
@@ -44,7 +44,7 @@ class MainLifecycleTests(unittest.TestCase):
         self.ExampleTestCase.quiet = True
         self.ExampleTestCase.test = True
 
-        result = wamptest.wamptest.main(
+        result = wamptest.main(
             test_cases=[self.ExampleTestCase, self.ExampleTestCase],
             url=u"test",
             realm=u"test",

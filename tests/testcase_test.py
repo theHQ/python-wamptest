@@ -1,11 +1,11 @@
 import unittest
-import wamptest.wamptest
+import wamptest
 
 
 class BaseTestCaseTests(unittest.TestCase):
 
     def setUp(self):
-        self.klass = wamptest.wamptest.TestCase
+        self.klass = wamptest.TestCase
         self.klass.quiet = True
         self.wamptest = self.klass(None)
         self.klass.reset()

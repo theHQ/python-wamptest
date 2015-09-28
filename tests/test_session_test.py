@@ -1,9 +1,9 @@
-import wamptest.wamptest
+import wamptest
 from twisted.internet.defer import inlineCallbacks
 from autobahn.twisted.util import sleep
 
 
-class ExampleTestCase(wamptest.wamptest.TestCase):
+class ExampleTestCase(wamptest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(ExampleTestCase, self).__init__(*args, **kwargs)
