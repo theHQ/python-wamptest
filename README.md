@@ -1,9 +1,29 @@
-#WAMPTEST
+# WAMPTEST
 
-**wamptest** is a library created for testing WAMP services that is based on "unittest".  The Twisted library uses a
-method called "defers" with a reactor which is not friendly to the unittest library.  I tried using "Trial" but it was
-also not suiting my needs since it needs to run a reactor.  I wanted something that allowed test suites to be created
-for connecting to an actual router.
+[![PyPi version](https://img.shields.io/pypi/v/wamptest.svg)](https://pypi.python.org/pypi/wamptest)
+[![PyPi downloads](https://img.shields.io/pypi/dm/wamptest.svg)](https://pypi.python.org/pypi/wamptest)
+[![Circle CI](https://img.shields.io/circleci/token/c7cf88195fd06c83918d352636111c8476fb1400/project/thehq/python-wamptest/master.svg)](https://circleci.com/gh/thehq/python-wamptest/tree/master)
+[![PyPi license](https://img.shields.io/pypi/l/crossbarhttp.svg)](https://pypi.python.org/pypi/crossbarhttp)
+
+**wamptest** is a library created for testing WAMP services that is based on "unittest".  
+
+## Revision History
+
+  - v0.2.6
+    - Fixed issue with running tests back to back
+    - Improved documentation
+  - v0.2.5
+    - Initial revision
+
+## Installation
+
+    pip install wamptest
+
+## Usage
+
+The Twisted library uses a method called "defers" with a reactor which is not friendly to the unittest library.  I tried
+using "Trial" but it was also not suiting my needs since it needs to run a reactor.  I wanted something that allowed 
+test suites to be created for connecting to an actual router.
 
 The library creates a class called "wamptest.TestCase" that subclasses from "autobahn.twisted.wamp.ApplicationSession" 
 which will allow it to connect to a router.  When you call "main" it will iterate through an array of test cases
@@ -86,10 +106,10 @@ Results are defined as follows
   - PASSED: At least 1 pass, no failures, no errors
   - FAILED: At least 1 failure or error
 
-#Contributing
+## Contributing
 To contribute, fork the repo and submit a pull request.  I have the following known "TODO"s.
 
-##TODOs
+## TODOs
 
   - Implement authenticated connections
   - Make library discover test cases so you don't need to pass them in
@@ -97,7 +117,7 @@ To contribute, fork the repo and submit a pull request.  I have the following kn
   - When a failure is sensed in a test, the test still continues but the remaining errors are suppressed.  Will need
     to figure out how to end the tests
 
-#Testing
+## Testing
 The unit tests can be run with
 
     %> python /tests/run_tests.py
@@ -123,5 +143,5 @@ This is a little hacky (and hopefully Docker will fix it) but it will do the tri
 The Docker Compose file creates a generic router with an example service connected to it and then creates a test suite 
 using "wamptest" to test the service.
 
-#License
+## License
 MIT

@@ -8,12 +8,12 @@ class BaseTestCaseTests(unittest.TestCase):
         self.klass = wamptest.TestCase
         self.klass.quiet = True
         self.wamptest = self.klass(None)
-        self.klass.reset()
+        self.wamptest.reset()
 
     def check_counters(self, passes, fails, errors):
-        self.assertEqual(passes, self.klass.passes)
-        self.assertEqual(fails, self.klass.failures)
-        self.assertEqual(errors, self.klass.errors)
+        self.assertEqual(passes, self.wamptest.passes)
+        self.assertEqual(fails, self.wamptest.failures)
+        self.assertEqual(errors, self.wamptest.errors)
 
     def check_pass(self):
         self.check_counters(1, 0, 0)

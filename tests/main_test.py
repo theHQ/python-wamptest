@@ -13,7 +13,8 @@ class MainLifecycleTests(unittest.TestCase):
 
         # TEST OVERRIDE
         @classmethod
-        def connect(cls, *args, **kwargs):
+        def connect(cls, test_runner=None, *args, **kwargs):
+            cls.test_runner = test_runner
             test_session = cls(None)
             test_session.onJoin(None)
 
@@ -41,14 +42,15 @@ class MainLifecycleTests(unittest.TestCase):
             self.assertTrue(False)
 
     def test_lifecycle(self):
-        self.ExampleTestCase.quiet = True
-        self.ExampleTestCase.test = True
+        wamptest.TestCase.quiet = True
+        wamptest.TestCase.test = True
 
         result = wamptest.main(
             test_cases=[self.ExampleTestCase, self.ExampleTestCase],
             url=u"test",
             realm=u"test",
-            quiet=True
+            quiet=True,
+            test=True
         )
 
         self.assertEqual(2, result)

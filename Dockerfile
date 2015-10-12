@@ -1,5 +1,5 @@
-FROM erichq/crossbar
-MAINTAINER Eric Chapman <eric@headquartershq.com>
+FROM thehq/crossbar:0.11.1
+MAINTAINER Eric Chapman <eric@thehq.io>
 
 COPY wamptest/ /app/wamptest/
 COPY tests/*.py /app/

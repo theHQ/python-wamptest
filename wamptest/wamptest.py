@@ -1,30 +1,72 @@
 from autobahn.twisted.wamp import ApplicationSession, ApplicationRunner
 from twisted.internet.defer import inlineCallbacks
 from twisted.internet import reactor
-from autobahn.wamp import auth
 from types import FunctionType
 import traceback
+
+
+class TestRunner(object):
+
+    def __init__(self, test_cases, url, realm, quiet=False, test=False):
+        self.total_tests = 0
+        self.total_errors = 0
+        self.total_failures = 0
+        self.total_passes = 0
+
+        self.quiet = quiet
+        self.test = test
+        self.test_fail = False
+
+        self.test_cases = test_cases
+        self.test_case_number = 0
+        self.url = url
+        self.realm = realm
+
+    def run(self):
+        if len(self.test_cases) > 0:
+            test_case = self.test_cases[0]
+            test_case.connect(url=self.url, realm=self.realm, test_runner=self)
+
+            if self.test is False:
+                reactor.run()
+
+    def report_test_results(self, tests, errors, failures, passes):
+        self.total_tests += tests
+        self.total_errors += errors
+        self.total_failures += failures
+        self.total_passes += passes
+
+        self.test_case_number += 1
+        if self.test_case_number < len(self.test_cases):
+            test_case = self.test_cases[self.test_case_number]
+            test_case.connect(url=self.url, realm=self.realm, test_runner=self)
+        elif self.test is False:
+            reactor.stop()
+
 
 class TestCase(ApplicationSession):
 
     WAMPCRA = u"wampcra"
 
-    # Internal variables
-    errors = 0
-    failures = 0
-    passes = 0
-    tests = 0
-    test_fail = False
-    quiet = False
-    test = False
+    test_runner = None
 
-    @classmethod
-    def reset(cls):
-        cls.errors = 0
-        cls.failures = 0
-        cls.passes = 0
-        cls.tests = 0
-        cls.test_fail = False
+    def __init__(self, config):
+        super(TestCase, self).__init__(config)
+
+        self.errors = 0
+        self.failures = 0
+        self.tests = 0
+        self.passes = 0
+
+        self.test_fail = False
+
+    def reset(self):
+        self.errors = 0
+        self.failures = 0
+        self.passes = 0
+        self.tests = 0
+
+        self.test_fail = False
 
     #def onConnect(self):
         #if self.user is not None:
@@ -44,13 +86,17 @@ class TestCase(ApplicationSession):
     @inlineCallbacks
     def onJoin(self, details):
 
+        # Setup the class
+        self.reset()
+        self.__class__.setUpClass()
+
         for method_name in [x for x, y in self.__class__.__dict__.items() if type(y) == FunctionType]:
 
             if not method_name.startswith("test_"):
                 continue
 
-            self.__class__.tests += 1
-            self.__class__.test_fail = False
+            self.tests += 1
+            self.test_fail = False
 
             self.setUp()
 
@@ -61,16 +107,30 @@ class TestCase(ApplicationSession):
 
             self.tearDown()
 
-        if self.__class__.test is False:
-            # Stops the reactor
-            reactor.stop()
+        # Teardown the class
+        self.__class__.tearDownClass()
+
+        # Report Done
+        self.__class__.test_runner.report_test_results(
+            tests=self.tests,
+            errors=self.errors,
+            failures=self.failures,
+            passes=self.passes
+        )
+
+        if self.__class__.test_runner.test is False:
+            # Disconnect
+            print "Disconnecting from the Session"
+            self.disconnect()
 
     @classmethod
-    def connect(cls, url=None, realm=None, user=None, secret=None):
+    def connect(cls, url=None, realm=None, test_runner=None, user=None, secret=None):
         print "Connecting to the url: '%s', realm: '%s'" % (url, realm)
 
+        cls.test_runner = test_runner
+
         runner = ApplicationRunner(url=url, realm=realm)
-        runner.run(cls)
+        runner.run(cls, start_reactor=False)
 
     @classmethod
     def setUpClass(cls):
@@ -249,34 +309,34 @@ class TestCase(ApplicationSession):
             return self._pass()
 
     def _pass(self):
-        self.__class__.passes += 1
+        self.passes += 1
         return True
 
     def _fail(self, message):
         # Can't exit since running in reactor so just suppress additional failures
-        if self.__class__.test_fail is False:
-            if self.quiet is False:
+        if self.test_fail is False:
+            if self.__class__.quiet is False:
                 stack = traceback.extract_stack()[-3:-1]
                 path, line, test, instr = stack[0]
                 print "\nFailure in %s: '%s'" % (test, message)
                 print "    File: %s:%s" % (path, line)
                 print "    Check: %s" % instr
-            self.__class__.failures += 1
-        self.__class__.test_fail = True
+            self.failures += 1
+        self.test_fail = True
         return False
 
     def _error(self, message):
-        if self.quiet is False:
+        if self.__class__.test_runner.quiet is False:
             stack = traceback.extract_stack()[-3:-1]
             path, line, test, instr = stack[0]
             print "\nError in %s: '%s'" % (test, message)
             print "    File: %s:%s" % (path, line)
             print "    Check: %s" % instr
-        self.__class__.errors += 1
+        self.errors += 1
         return False
 
 
-def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=False):
+def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=False, test=False):
     """
     Runs the test cases.  Example of use is as follows
 
@@ -321,8 +381,6 @@ def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=Fa
     :return: number of total errors and failures
     """
 
-    TestCase.quiet = quiet
-
     if test_cases is None:
         test_cases = []
 
@@ -334,46 +392,23 @@ def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=Fa
         print "Connection 'realm' must be defined."
         return 1
 
-    errors = 0
-    failures = 0
-    passes = 0
-    tests = 0
-
-    # Iterate through the test cases
-    for test_case in test_cases:
-
-        # Ensure klass is the correct type
-        if not issubclass(test_case, TestCase):
-            raise Exception("The class '%s' is not a subclass of wamptest.TestCase" % test_case.__name__)
-
-        # Initialize the test case
-        test_case.reset()
-        test_case.setUpClass()
-
-        # Will exit when reactor is stopped in onJoin
-        test_case.connect(url=url, realm=realm)
-
-        # Get test suite results
-        errors += test_case.errors
-        failures += test_case.failures
-        passes += test_case.passes
-        tests += test_case.tests
-
-        test_case.tearDownClass()
+    # Run the tests
+    test_runner = TestRunner(test_cases, url, realm, quiet, test)
+    test_runner.run()
 
     # Print the results
     if quiet is False:
         heading = "\nResult:"
-        if tests == 0:
+        if test_runner.total_tests == 0:
             print heading, "UNKNOWN"
-        elif (errors + failures) == 0:
+        elif (test_runner.total_errors + test_runner.total_failures) == 0:
             print heading, "PASSED"
         else:
             print heading, "FAILED"
 
-        print "    Tests: %d" % tests
-        print "    Passes: %d" % passes
-        print "    Failures: %d" % failures
-        print "    Errors: %d" % errors
+        print "    Tests: %d" % test_runner.total_tests
+        print "    Passes: %d" % test_runner.total_passes
+        print "    Failures: %d" % test_runner.total_failures
+        print "    Errors: %d" % test_runner.total_errors
 
-    return errors + failures
+    return test_runner.total_errors + test_runner.total_failures
