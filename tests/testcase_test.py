@@ -146,6 +146,16 @@ class TestCaseAssertTests(BaseTestCaseTests):
         self.assertFalse(result)
         self.check_fail()
 
+    def test_raise_exception_pass(self):
+        with self.wamptest.assertRaises(Exception) as context:
+            raise Exception("This was raised")
+        self.check_pass()
+
+    def test_raise_exception_fail(self):
+        with self.wamptest.assertRaises(Exception) as context:
+            raise BaseException("This was raised")
+        self.check_fail()
+
 class TestMultiFail(BaseTestCaseTests):
 
     def test_back_to_back_fails(self):

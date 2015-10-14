@@ -9,6 +9,8 @@
 
 ## Revision History
 
+  - v0.2.7
+    - Added "assertRaises"
   - v0.2.6
     - Fixed issue with running tests back to back
     - Improved documentation
@@ -53,20 +55,23 @@ It supports the following "unittest" like life cycle callbacks
     
 It supports the following "unittest" like asserts
 
-  - assertEqual(a, b)
-  - assertNotEqual(a, b)
-  - assertIsNone(a)
-  - assertIsNotNone(a)
-  - assertTrue(a)
-  - assertFalse(a)
-  - assertGreater(a, b)
-  - assertGreaterEqual(a, b)
-  - assertLess(a, b)
-  - assertLessEqual(a, b)
+  - assertEqual(a, b, msg=None)
+  - assertNotEqual(a, b, msg=None)
+  - assertIsNone(a, msg=None)
+  - assertIsNotNone(a, msg=None)
+  - assertTrue(a, msg=None)
+  - assertFalse(a, msg=None)
+  - assertGreater(a, b, msg=None)
+  - assertGreaterEqual(a, b, msg=None)
+  - assertLess(a, b, msg=None)
+  - assertLessEqual(a, b, msg=None)
+  - assertRaises(exc, msg=None)
   
 Writing tests must use inlineCallbacks to halt the test until completion.  An example is as follows
 
-    class ExampleTestCase(wamptest.wamptest.TestCase):
+    import wamptest
+
+    class ExampleTestCase(wamptest.TestCase):
     
         def __init__(self, *args, **kwargs):
             super(ExampleTestCase, self).__init__(*args, **kwargs)
@@ -89,6 +94,11 @@ Writing tests must use inlineCallbacks to halt the test until completion.  An ex
             yield sleep(2)
     
             self.assertEqual("test", self.update)
+            
+        @inlineCallbacks
+        def test_3(self):
+            with self.assertRaises(Exception) as context:
+                yield self.call("test.trigger.exception")
 
 At the completion of a test, a summary will be printed to the screen that looks something like the following
 

@@ -5,7 +5,6 @@ from autobahn.twisted.util import sleep
 
 class TestSession(ApplicationSession):
 
-    @inlineCallbacks
     def onJoin(self, details):
 
         def add(x, y):
@@ -22,5 +21,8 @@ class TestSession(ApplicationSession):
         self.register(trigger, "test.trigger")
         print "Registered Trigger"
 
-        while True:
-            yield sleep(1)
+        def trigger_error():
+            raise Exception("This happened")
+
+        self.register(trigger_error, "test.trigger.error")
+        print "Registered Trigger Error"

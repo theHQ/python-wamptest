@@ -1,6 +1,7 @@
 import wamptest
 from twisted.internet.defer import inlineCallbacks
 from autobahn.twisted.util import sleep
+from autobahn.wamp.exception import ApplicationError
 
 
 class ExampleTestCase1(wamptest.TestCase):
@@ -38,6 +39,11 @@ class ExampleTestCase2(wamptest.TestCase):
     def test_1(self):
         result = yield self.call("test.add", 1, 2)
         self.assertEqual(3, result)
+
+    @inlineCallbacks
+    def test_2(self):
+        with self.assertRaises(ApplicationError) as context:
+            yield self.call("test.trigger.error")
 
 
 if __name__ == '__main__':
