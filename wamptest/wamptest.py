@@ -103,7 +103,9 @@ class TestCase(ApplicationSession):
 
             try:
                 yield getattr(self, method_name)()
-            except Exception, e:
+            except BaseException, e:
+                self._error(str(e))
+            except RuntimeError, e:
                 self._error(str(e))
 
             self.tearDown()

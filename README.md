@@ -9,6 +9,8 @@
 
 ## Revision History
 
+  - v0.2.8
+    - Updated main "except" to catch BaseException and RuntimeError
   - v0.2.7
     - Added "assertRaises"
   - v0.2.6
