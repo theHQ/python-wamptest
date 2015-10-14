@@ -1,5 +1,6 @@
 import unittest
 import wamptest
+from autobahn.wamp.exception import ApplicationError
 
 
 class MainLifecycleTests(unittest.TestCase):
@@ -41,6 +42,9 @@ class MainLifecycleTests(unittest.TestCase):
         def test_3(self):
             self.assertTrue(False)
 
+        def test_4(self):
+            raise ApplicationError(u"wamp.error")
+
     def test_lifecycle(self):
         wamptest.TestCase.quiet = True
         wamptest.TestCase.test = True
@@ -53,8 +57,8 @@ class MainLifecycleTests(unittest.TestCase):
             test=True
         )
 
-        self.assertEqual(2, result)
+        self.assertEqual(4, result)
         self.assertEqual(2, self.ExampleTestCase._setup_class_count)
         self.assertEqual(2, self.ExampleTestCase._teardown_class_count)
-        self.assertEqual(6, self.ExampleTestCase._setup_count)
-        self.assertEqual(6, self.ExampleTestCase._teardown_count)
+        self.assertEqual(8, self.ExampleTestCase._setup_count)
+        self.assertEqual(8, self.ExampleTestCase._teardown_count)

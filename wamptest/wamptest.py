@@ -103,10 +103,10 @@ class TestCase(ApplicationSession):
 
             try:
                 yield getattr(self, method_name)()
-            except BaseException, e:
+            except Exception, e:
                 self._error(str(e))
-            except RuntimeError, e:
-                self._error(str(e))
+            #except RuntimeError, e:
+            #    self._error(str(e))
 
             self.tearDown()
 
@@ -319,11 +319,15 @@ class TestCase(ApplicationSession):
         :param msg: Custom message on failure
         """
         success = False
+        exc = None
         try:
             yield exception_class
         except BaseException, e:
             print e
-            if issubclass(e.__class__, exception_class):
+            exc = e
+
+        if exc is not None:
+            if issubclass(exc.__class__, exception_class):
                 success = True
 
         if success is False:

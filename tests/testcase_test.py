@@ -1,5 +1,6 @@
 import unittest
 import wamptest
+from autobahn.wamp.exception import ApplicationError
 
 
 class BaseTestCaseTests(unittest.TestCase):
@@ -147,12 +148,22 @@ class TestCaseAssertTests(BaseTestCaseTests):
         self.check_fail()
 
     def test_raise_exception_pass(self):
-        with self.wamptest.assertRaises(Exception) as context:
+        with self.wamptest.assertRaises(BaseException) as context:
             raise Exception("This was raised")
         self.check_pass()
 
     def test_raise_exception_fail(self):
-        with self.wamptest.assertRaises(Exception) as context:
+        with self.wamptest.assertRaises(ApplicationError) as context:
+            raise BaseException("This was raised")
+        self.check_fail()
+
+    def test_raise_exception_pass_runtime(self):
+        with self.wamptest.assertRaises(RuntimeError) as context:
+            raise ApplicationError(u"This was raised")
+        self.check_pass()
+
+    def test_raise_exception_fail_runtime(self):
+        with self.wamptest.assertRaises(ApplicationError) as context:
             raise BaseException("This was raised")
         self.check_fail()
 
