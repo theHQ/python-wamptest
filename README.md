@@ -9,6 +9,8 @@
 
 ## Revision History
 
+  - v0.2.11
+    - Add flush of stdout so results are printed when there are errors
   - v0.2.8-0.2.10
     - Fixing issues with exceptions
   - v0.2.7

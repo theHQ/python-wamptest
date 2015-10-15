@@ -3,6 +3,7 @@ from twisted.internet.defer import inlineCallbacks
 from twisted.internet import reactor
 from types import FunctionType
 import traceback
+import sys
 from contextlib import contextmanager
 
 
@@ -309,7 +310,7 @@ class TestCase(ApplicationSession):
     def assertRaises(self, exception_class, msg=None):
         """
         Asserts that a block of code raises an exception
-        :param exception: The type of class expected
+        :param exception_class: The type of class expected
         :param msg: Custom message on failure
         """
         success = False
@@ -433,5 +434,7 @@ def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=Fa
         print "    Passes: %d" % test_runner.total_passes
         print "    Failures: %d" % test_runner.total_failures
         print "    Errors: %d" % test_runner.total_errors
+
+    sys.stdout.flush()
 
     return test_runner.total_errors + test_runner.total_failures
