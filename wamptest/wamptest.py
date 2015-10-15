@@ -50,6 +50,17 @@ class TestCase(ApplicationSession):
     WAMPCRA = u"wampcra"
 
     test_runner = None
+    quiet = False
+
+    def is_quiet(self):
+        test_runner = self.get_test_runner()
+        if test_runner is not None:
+            return test_runner.quiet or self.__class__.quiet
+        else:
+            return self.__class__.quiet
+
+    def get_test_runner(self):
+        return self.__class__.test_runner
 
     def __init__(self, config):
         super(TestCase, self).__init__(config)
@@ -68,21 +79,6 @@ class TestCase(ApplicationSession):
         self.tests = 0
 
         self.test_fail = False
-
-    #def onConnect(self):
-        #if self.user is not None:
-    #    if self.quiet is False:
-    #        print "Attempting to join the realm '%s'" % self.realm
-    #    self.join(unicode(self.realm), [self.WAMPCRA], unicode(self.user))
-
-    #def onChallenge(self, challenge):
-    #    if self.quiet is False:
-    #        print "Received Auth Challenge"
-    #    if challenge.method == self.WAMPCRA:
-    #        signature = auth.compute_wcs(unicode(self.secret).encode('utf8'), challenge.extra['challenge'].encode('utf8'))
-    #        return signature.decode('ascii')
-    #    else:
-    #        raise Exception("don't know how to handle authmethod {}".format(challenge.method))
 
     @inlineCallbacks
     def onJoin(self, details):
@@ -103,10 +99,8 @@ class TestCase(ApplicationSession):
 
             try:
                 yield getattr(self, method_name)()
-            except Exception, e:
+            except BaseException, e:
                 self._error(str(e))
-            #except RuntimeError, e:
-            #    self._error(str(e))
 
             self.tearDown()
 
@@ -114,14 +108,14 @@ class TestCase(ApplicationSession):
         self.__class__.tearDownClass()
 
         # Report Done
-        self.__class__.test_runner.report_test_results(
+        self.get_test_runner().report_test_results(
             tests=self.tests,
             errors=self.errors,
             failures=self.failures,
             passes=self.passes
         )
 
-        if self.__class__.test_runner.test is False:
+        if self.get_test_runner().test is False:
             # Disconnect
             print "Disconnecting from the Session"
             self.disconnect()
@@ -344,7 +338,7 @@ class TestCase(ApplicationSession):
     def _fail(self, message):
         # Can't exit since running in reactor so just suppress additional failures
         if self.test_fail is False:
-            if self.__class__.quiet is False:
+            if self.is_quiet() is False:
                 stack = traceback.extract_stack()[-3:-1]
                 path, line, test, instr = stack[0]
                 print "\nFailure in %s: '%s'" % (test, message)
@@ -355,7 +349,7 @@ class TestCase(ApplicationSession):
         return False
 
     def _error(self, message):
-        if self.__class__.test_runner.quiet is False:
+        if self.is_quiet() is False:
             stack = traceback.extract_stack()[-3:-1]
             path, line, test, instr = stack[0]
             print "\nError in %s: '%s'" % (test, message)
