@@ -24,6 +24,23 @@
                      ]
                   }
                ]
+            },
+            {
+               "name": "realm2",
+               "roles": [
+                  {
+                     "name": "protected",
+                     "permissions": [
+                        {
+                           "uri": "*",
+                           "publish": true,
+                           "subscribe": true,
+                           "call": true,
+                           "register": true
+                        }
+                     ]
+                  }
+               ]
             }
          ],
          "transports": [
@@ -40,6 +57,20 @@
                   },
                   "ws": {
                      "type": "websocket"
+                  },
+                  "wsp": {
+                     "type": "websocket",
+                     "auth": {
+                        "wampcra": {
+                           "type": "static",
+                           "users": {
+                              "user": {
+                                 "secret": "secret",
+                                 "role": "protected"
+                              }
+                           }
+                        }
+                     }
                   }
                }
             }
@@ -63,6 +94,20 @@
                      "port": 8080
                   },
                   "url": "ws://localhost:8080/ws"
+               }
+            },
+            {
+               "type": "class",
+               "classname": "src.test_session.TestSession",
+               "realm": "realm2",
+               "transport": {
+                  "type": "websocket",
+                  "endpoint": {
+                     "type": "tcp",
+                     "host": "localhost",
+                     "port": 8080
+                  },
+                  "url": "ws://localhost:8080/wsp"
                }
             }
          ]

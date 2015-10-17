@@ -49,8 +49,10 @@ class ExampleTestCase2(wamptest.TestCase):
 if __name__ == '__main__':
     errors = wamptest.wamptest.main(
         test_cases=[ExampleTestCase1, ExampleTestCase2],
-        url=u"ws://router:8080/ws",
-        realm=u"realm1"
+        url=u"ws://router:8080/wsp",
+        realm=u"realm2",
+        user=u"user",
+        secret=u"secret"
     )
 
     exit(errors)

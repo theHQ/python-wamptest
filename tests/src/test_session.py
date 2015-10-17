@@ -1,9 +1,24 @@
 from autobahn.twisted.wamp import ApplicationSession
-from twisted.internet.defer import inlineCallbacks
-from autobahn.twisted.util import sleep
+from autobahn.wamp import auth
 
 
 class TestSession(ApplicationSession):
+
+    def onConnect(self):
+        if self.config.realm == "realm2":
+            self.join(self.config.realm, [u"wampcra"], u"user")
+        else:
+            super(TestSession, self).onConnect()
+
+    def onChallenge(self, challenge):
+        if challenge.method == u"wampcra":
+            signature = auth.compute_wcs(
+                u"secret".encode('utf8'),
+                challenge.extra['challenge'].encode('utf8')
+            )
+            return signature.decode('ascii')
+        else:
+            raise Exception("don't know how to handle authmethod {}".format(challenge.method))
 
     def onJoin(self, details):
 

@@ -9,6 +9,8 @@
 
 ## Revision History
 
+  - v0.3.0
+    - Added WAMPCRA auth handling
   - v0.2.11
     - Add flush of stdout so results are printed when there are errors
   - v0.2.8-0.2.10
@@ -48,6 +50,16 @@ The test is run by calling "main".  Here is an example
         test_cases=[ExampleTestCase1, ExampleTestCase2],
         url=u"ws://router:8080/ws",
         realm=u"realm1"
+    )
+    
+For WAMPCRA authentication, simply include "user" and "secret" in the call to main
+
+    code = wamptest.main(
+        test_cases=[ExampleTestCase1, ExampleTestCase2],
+        url=u"ws://router:8080/ws",
+        realm=u"realm1",
+        user=u"user",
+        secret=u"secret"
     )
     
 It supports the following "unittest" like life cycle callbacks

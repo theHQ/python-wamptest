@@ -22,3 +22,4 @@ run "python -u run_tests.py"
 sleep 5
 
 run "python -u test_session_test.py"
+run "python -u test_session_auth_test.py"

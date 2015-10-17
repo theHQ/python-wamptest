@@ -1,6 +1,7 @@
 from autobahn.twisted.wamp import ApplicationSession, ApplicationRunner
 from twisted.internet.defer import inlineCallbacks
 from twisted.internet import reactor
+from autobahn.wamp import auth
 from types import FunctionType
 import traceback
 import sys
@@ -9,7 +10,7 @@ from contextlib import contextmanager
 
 class TestRunner(object):
 
-    def __init__(self, test_cases, url, realm, quiet=False, test=False):
+    def __init__(self, test_cases, url, realm, quiet=False, test=False, user=None, secret=None):
         self.total_tests = 0
         self.total_errors = 0
         self.total_failures = 0
@@ -23,6 +24,9 @@ class TestRunner(object):
         self.test_case_number = 0
         self.url = url
         self.realm = realm
+
+        self.auth_user = user
+        self.auth_secret = secret
 
     def run(self):
         if len(self.test_cases) > 0:
@@ -80,6 +84,22 @@ class TestCase(ApplicationSession):
         self.tests = 0
 
         self.test_fail = False
+
+    def onConnect(self):
+        if self.get_test_runner().auth_user is not None:
+            self.join(self.config.realm, [u"wampcra"], unicode(self.get_test_runner().auth_user))
+        else:
+            super(TestCase, self).onConnect()
+
+    def onChallenge(self, challenge):
+        if challenge.method == u"wampcra":
+            signature = auth.compute_wcs(
+                unicode(self.get_test_runner().auth_secret).encode('utf8'),
+                challenge.extra['challenge'].encode('utf8')
+            )
+            return signature.decode('ascii')
+        else:
+            raise Exception("don't know how to handle authmethod {}".format(challenge.method))
 
     @inlineCallbacks
     def onJoin(self, details):
@@ -417,7 +437,7 @@ def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=Fa
         return 1
 
     # Run the tests
-    test_runner = TestRunner(test_cases, url, realm, quiet, test)
+    test_runner = TestRunner(test_cases, url, realm, quiet=quiet, test=test, user=user, secret=secret)
     test_runner.run()
 
     # Print the results
