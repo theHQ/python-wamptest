@@ -338,7 +338,7 @@ class TestCase(ApplicationSession):
         try:
             yield exception_class
         except BaseException, e:
-            print e
+            print >> sys.stderr, e
             exc = e
 
         if exc is not None:
@@ -362,9 +362,9 @@ class TestCase(ApplicationSession):
             if self.is_quiet() is False:
                 stack = traceback.extract_stack()[-3:-1]
                 path, line, test, instr = stack[0]
-                print "\nFailure in %s: '%s'" % (test, message)
-                print "    File: %s:%s" % (path, line)
-                print "    Check: %s" % instr
+                print >> sys.stderr, "\nFailure in %s: '%s'" % (test, message)
+                print >> sys.stderr, "    File: %s:%s" % (path, line)
+                print >> sys.stderr, "    Check: %s" % instr
             self.failures += 1
         self.test_fail = True
         return False
@@ -373,9 +373,9 @@ class TestCase(ApplicationSession):
         if self.is_quiet() is False:
             stack = traceback.extract_stack()[-3:-1]
             path, line, test, instr = stack[0]
-            print "\nError in %s: '%s'" % (test, message)
-            print "    File: %s:%s" % (path, line)
-            print "    Check: %s" % instr
+            print >> sys.stderr, "\nError in %s: '%s'" % (test, message)
+            print >> sys.stderr, "    File: %s:%s" % (path, line)
+            print >> sys.stderr, "    Check: %s" % instr
         self.errors += 1
         return False
 
@@ -454,7 +454,5 @@ def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=Fa
         print >> sys.stderr, "    Passes: %d" % test_runner.total_passes
         print >> sys.stderr, "    Failures: %d" % test_runner.total_failures
         print >> sys.stderr, "    Errors: %d" % test_runner.total_errors
-
-    sys.stdout.flush()
 
     return test_runner.total_errors + test_runner.total_failures
