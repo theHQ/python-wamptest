@@ -9,6 +9,8 @@
 
 ## Revision History
 
+  - v0.3.1
+    - Moved final print messages to print to standard error to ensure they are always printed
   - v0.3.0
     - Added WAMPCRA auth handling
   - v0.2.11

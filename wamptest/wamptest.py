@@ -444,16 +444,16 @@ def main(test_cases=None, url=None, realm=None, user=None, secret=None, quiet=Fa
     if quiet is False:
         heading = "\nResult:"
         if test_runner.total_tests == 0:
-            print heading, "UNKNOWN"
+            print >> sys.stderr, heading, "UNKNOWN"
         elif (test_runner.total_errors + test_runner.total_failures) == 0:
-            print heading, "PASSED"
+            print >> sys.stderr, heading, "PASSED"
         else:
-            print heading, "FAILED"
+            print >> sys.stderr, heading, "FAILED"
 
-        print "    Tests: %d" % test_runner.total_tests
-        print "    Passes: %d" % test_runner.total_passes
-        print "    Failures: %d" % test_runner.total_failures
-        print "    Errors: %d" % test_runner.total_errors
+        print >> sys.stderr, "    Tests: %d" % test_runner.total_tests
+        print >> sys.stderr, "    Passes: %d" % test_runner.total_passes
+        print >> sys.stderr, "    Failures: %d" % test_runner.total_failures
+        print >> sys.stderr, "    Errors: %d" % test_runner.total_errors
 
     sys.stdout.flush()
 
