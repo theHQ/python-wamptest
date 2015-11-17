@@ -45,7 +45,6 @@ class ExampleTestCase2(wamptest.TestCase):
         with self.assertRaises(ApplicationError) as context:
             yield self.call("test.trigger.error")
 
-
 if __name__ == '__main__':
     errors = wamptest.wamptest.main(
         test_cases=[ExampleTestCase1, ExampleTestCase2],

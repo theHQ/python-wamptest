@@ -121,6 +121,7 @@ class TestCase(ApplicationSession):
             try:
                 yield getattr(self, method_name)()
             except BaseException, e:
+                traceback.print_exc()
                 self._error(str(e))
 
             self.tearDown()

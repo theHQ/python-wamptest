@@ -1,6 +1,6 @@
 import unittest
-from testcase_test import *
-from main_test import *
+from test_asserts import *
+from test_lifecycle import *
 
 
 if __name__ == '__main__':

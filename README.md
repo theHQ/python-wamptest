@@ -9,6 +9,8 @@
 
 ## Revision History
 
+  - v0.3.3
+    - Updated Uncaught Exception to print stack trace
   - v0.3.2
     - Updated all prints to print to standard error
   - v0.3.1
@@ -41,8 +43,8 @@ The library creates a class called "wamptest.TestCase" that subclasses from "aut
 which will allow it to connect to a router.  When you call "main" it will iterate through an array of test cases
 that will do the following
 
+  - Connect to the router using an ApplicationRunner
   - For each test case in the test cases
-    - Connect to the router using an ApplicationRunner
     - Iterate through the tests (any method that start with "test_")
     - Gather pass/fail information
     - Stop the reactor
